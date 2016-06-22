@@ -15,58 +15,94 @@ function updateCounters() {
   $("#todo-count").html($(".todo").length - $(".completed").length);
 }
 
-  function nextTodoId() {
-    return $(".todo").length + 1;
-  }
-
   function createTodo(title) {
-    var checkboxId = "todo-" + nextTodoId();
+    var newTodo = { title: title, completed: false };
 
-      var listItem = $("<li></li>");
+    $.ajax({
+      type: "POST",
+      url: "/todos.json",
+      data: JSON.stringify({
+          todo: newTodo
+      }),
+      contentType: "application/json",
+      dataType: "json"})
+
+      .done(function(data) {
+        console.log(data);
+
+        var checkboxId = "todo-" + data.id;
+
+        var listItem = $("<li></li>");
         listItem.addClass("todo");
+        listItem.attr('data-id', data.id);
 
         var checkbox = $('<input>');
-          checkbox.attr('type', 'checkbox');
-          checkbox.attr('id', checkboxId);
-          checkbox.val(1);
-          checkbox.bind('change', toggleDone);
+        checkbox.attr('type', 'checkbox');
+        checkbox.attr('id', checkboxId);
+        checkbox.val(1);
+        checkbox.bind('change', toggleDone);
 
-            var space = document.createTextNode(" ");
+        var space = document.createTextNode(" ");
 
-              var label = $('<label></label>');
-                label.attr('for', checkboxId);
-                label.html(title);
+        var label = $('<label></label>');
+        label.attr('for', checkboxId);
+        label.html(data.title);
 
-                listItem.append(checkbox);
-                listItem.append(space);
-                listItem.append(label);
+        listItem.append(checkbox);
+        listItem.append(space);
+        listItem.append(label);
 
-                  $("#todolist").append( listItem );
+        $("#todolist").append( listItem );
 
-                  updateCounters();
-      }
+        updateCounters();
+      })
+
+      .fail(function(error) {
+        console.log(error);
+
+        error_messsage = error.responseJSON.title[0];
+        showError(error_messsage);
+      });
+  }
+
+function showError(message) {
+  $("#todo_title").addClass("error");
+
+  var errorElement = $("<small></small>")
+    .addClass('error')
+    .html(message);
+
+  $(errorElement).appendTo('form .field');
+}
+
+function resetErrors() {
+  $("#error_message").remove();
+  $("#todo_title").removeClass("error");
+}
 
 function submitTodo(event) {
   event.preventDefault();
+    resetErrors();
     createTodo($("#todo_title").val());
-      $("#todo_title").val(null);
-        updateCounters();
+    $("#todo_title").val(null);
+
+    updateCounters();
 }
 
 function cleanUpDoneTodos(event) {
   event.preventDefault();
   $.when($(".completed").remove())
     .then(updateCounters);
-}
+      }
 
-$("input[type=checkbox]").bind('change', toggleDone);
-  $("form").bind('submit', submitTodo);
-    $("#clean-up").bind('click', cleanUpDoneTodos);
-      updateCounters();
+      $("input[type=checkbox]").bind('change', toggleDone);
+        $("form").bind('submit', submitTodo);
+          $("#clean-up").bind('click', cleanUpDoneTodos);
+            updateCounters();
 
-$(document).ready(function() {
-  $("input[type=checkbox]").bind('change', toggleDone);
-    $("form").bind('submit', submitTodo);
-      $("#clean-up").bind('click', cleanUpDoneTodos);
-        updateCounters();
-});
+      $(document).ready(function() {
+        $("input[type=checkbox]").bind('change', toggleDone);
+          $("form").bind('submit', submitTodo);
+            $("#clean-up").bind('click', cleanUpDoneTodos);
+              updateCounters();
+      });
