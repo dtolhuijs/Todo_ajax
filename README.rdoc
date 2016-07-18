@@ -6,9 +6,7 @@ This is a simple todo list project built with Ruby on rails and uses ajax to upd
 
 # Set up
 
-```bash
-Ruby 2.2.5
-postgresql database
-localhost:3000
-```
+  Ruby 2.2.5
+  postgresql database
+  localhost:3000
 
