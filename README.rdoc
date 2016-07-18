@@ -1,7 +1,7 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+# Description
+This is a simple todo list project built with Ruby on rails and uses ajax to update the list.
 
 Things you may want to cover:
 
